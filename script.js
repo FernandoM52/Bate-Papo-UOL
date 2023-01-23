@@ -10,10 +10,10 @@ login()
 // Post para logar no servidor
 function postLogin() {
     const nameObject = { name: userLogin };
-    const promise = axios.post("https://mock-api.driven.com.br/api/v6/uol/participants", nameObject); // Enviando nome de login para o servidor
+    const promise = axios.post("https://mock-api.driven.com.br/api/v6/uol/participants", nameObject);
     promise.then(loginSuccess);
-    promise.catch(loginFailure); //*****Nao esquecer de fazer o tratamento em caso de login igual********
-    //connectionRequest();
+    promise.catch(loginFailure);
+    connectionRequest();
 }
 function loginSuccess() {
     console.log("Login Success");
@@ -25,6 +25,11 @@ function loginFailure(erroToLogin) {
     console.log("Login falhou");
     const statusError = erroToLogin.response.status;
     console.log(statusError);
+    if (statusError === 400) {
+        alert("Nome de usuário já está sendo usado, digite um novo nome de usuário");
+        window.location.reload()
+    }
+
 }
 
 // Request de conexao no servidor
@@ -34,13 +39,13 @@ function connectionRequest() {
     promise.catch(disconnected);
 }
 function disconnected(req) {
-    console.log("Voce foi desconectado");
+    alert("Voce foi desconectado");
 }
 
 // Puxando mensagens do servidor
 function getMessages() {
     const promise = axios.get("https://mock-api.driven.com.br/api/v6/uol/messages");
-    promise.then(getMessagesSuccess);
+    promise.then(showMessages);
     promise.catch(getMessagesFailure);
 }
 function getMessagesSuccess(msgsResponse) {
@@ -53,7 +58,10 @@ function getMessagesFailure(msgsError) {
     window.location.reload()
 }
 
-function showMessages(messagesList) {
+let page = document.querySelector("main");
+
+function showMessages(response) {
+    messagesList = response.data;
     let mensagem = "";
 
     for (let i = 0; i < messagesList.length; i++) {
@@ -66,28 +74,51 @@ function showMessages(messagesList) {
 
         if (type === "status") {
             mensagem += `<li>
-                            <div class="box-msgs statusChat">
-                                <p> <span clas="msgTime">(${time}&)</span> <span class="msgUser">${from}</span> <span class="normalText">${text}</span> </p>
+                            <div data-test="message" class="box-msgs statusChat">
+                                <p> <span clas="msgTime">(${time})</span> <span class="msgUser">${from}</span> <span class="normalText">${text}</span> </p>
                             </div>
                          </li>
                         `
         } else if (type === "message") {
             mensagem += `<li>
-                             <div class="box-msgs allChat">
-                                <p> <span clas="msgTime">(${time}&)</span> <span class="msgUser">${from}</span> para <span class="msgUser">${to}:</span> <span class="normalText">${text}</span> </p>
+                             <div data-test="message" class="box-msgs allChat">
+                                <p> <span clas="msgTime">(${time})</span> <span class="msgUser">${from}</span> para <span class="msgUser">${to}:</span> <span class="normalText">${text}</span> </p>
                              </div>
                          </li>
                         `
         } else if (type === "private_message" && messagesList.to === userLogin) {
             mensagem += `<li>
-                             <div class="box-msgs privateChat">
-                                <p> <span clas="msgTime">(${time}&)</span> <span class="msgUser">${from}</span> para <span class="msgUser">${to}:</span> ${text} </p>
+                             <div data-test="message" class="box-msgs privateChat">
+                                <p> <span clas="msgTime">(${time})</span> <span class="msgUser">${from}</span> para <span class="msgUser">${to}:</span> ${text} </p>
                              </div>
                          </li>
                         `
         }
 
-        let templateMsgs = document.querySelector("ul").innerHTML;
-        templateMsgs += mensagem;
+        document.querySelector("ul").innerHTML = mensagem;
+
     }
+    page.scrollIntoView();
+}
+let messageInput = document.querySelector('input');
+function sendMessage() {
+    let inputMessageTemplate = {
+        from: userLogin,
+        to: "Todos",
+        text: messageInput.value,
+        type: "message"
+    };
+    const promise = axios.post("https://mock-api.driven.com.br/api/v6/uol/messages", inputMessageTemplate);
+    promise.then(sendMessageSuccess);
+
+}
+
+function sendMessageSuccess() {
+    messageInput.value = "";
+    getMessages();
+}
+
+function sendMessageFailure() {
+    alert("Erro ao enviar mensagem, faça o login novamente.");
+    window.location.reload();
 }
