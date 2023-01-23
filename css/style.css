@@ -43,6 +43,54 @@ main {
 ul {
     width: 100%;
     margin-top: 106px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+li {
+    width: 100%;
+    border-radius: 2px;
+    margin-bottom: 4px;
+}
+
+.box-msgs {
+    width: 100%;
+    height: auto;
+    padding: 9px;
+
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16px;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+}
+
+.statusChat {
+    background-color: #DCDCDC;
+}
+
+.allChat {
+    background-color: #FFFFFF;
+}
+
+.privateChat {
+    background-color: #FFDEDE;
+}
+
+.msgUser {
+    font-weight: 700;
+}
+
+.normalText {
+    word-wrap: break-word;
+}
+
+.msgTime {
+    color: #AAAAAA;
 }
 
 footer {
@@ -78,30 +126,4 @@ footer ion-icon {
     width: 26px;
     height: 26px;
     padding-right: 18px;
-}
-
-li {
-    width: 100%;
-    border-radius: 2px;
-    margin-bottom: 4px;
-}
-
-.statusChat {
-    background-color: #DCDCDC;
-}
-
-.allChat {
-    background-color: #FFFFFF;
-}
-
-.privateChat {
-    background-color: #FFDEDE;
-}
-
-.statusChat,
-.allChat,
-.privateChat {
-    width: 358px;
-    margin: auto;
-
 }
